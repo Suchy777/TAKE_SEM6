@@ -3,6 +3,7 @@ package pl.sucheniaserafin.liga.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.sucheniaserafin.liga.dto.BramkaDTO;
+import pl.sucheniaserafin.liga.entities.Bramka;
 import pl.sucheniaserafin.liga.repositories.BramkaRepository;
 
 import java.util.List;
@@ -24,5 +25,23 @@ public class BramkaService {
                         b.getMecz().getGospodarz().getNazwa() + " vs " + b.getMecz().getGosc().getNazwa()
                 ))
                 .collect(Collectors.toList());
+    }
+
+    public BramkaDTO getBramkaById(Long id) {
+        return bramkaRepository.findById(id)
+                .map(b -> new BramkaDTO(b.getId(), b.getMinuta(), b.getStrzelec().getNazwisko(), b.getMecz().getWynik()))
+                .orElse(null);
+    }
+
+    public void deleteBramka(Long id) {
+        bramkaRepository.deleteById(id);
+    }
+
+    public BramkaDTO updateBramka(Long id, BramkaDTO dto) {
+        return bramkaRepository.findById(id).map(b -> {
+            b.setMinuta(dto.minuta());
+            Bramka zaktualizowana = bramkaRepository.save(b);
+            return new BramkaDTO(zaktualizowana.getId(), zaktualizowana.getMinuta(), zaktualizowana.getStrzelec().getNazwisko(), zaktualizowana.getMecz().getWynik());
+        }).orElse(null);
     }
 }

@@ -1,7 +1,11 @@
 package pl.sucheniaserafin.liga.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.sucheniaserafin.liga.dto.MeczDTO;
@@ -19,5 +23,20 @@ public class MeczController {
     @GetMapping
     public List<MeczDTO> getAllMecze() {
         return meczService.getAllMecze();
+    }
+
+    @GetMapping("/{id}")
+    public MeczDTO getMeczById(@PathVariable Long id) {
+        return meczService.getMeczById(id);
+    }
+
+    @PutMapping("/{id}/wynik")
+    public MeczDTO updateMeczWynik(@PathVariable Long id, @RequestBody MeczDTO dto) {
+        return meczService.updateMeczWynik(id, dto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteMecz(@PathVariable Long id) {
+        meczService.deleteMecz(id);
     }
 }
