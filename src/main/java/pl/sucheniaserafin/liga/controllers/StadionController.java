@@ -34,4 +34,9 @@ public class StadionController {
     public StadionDTO addStadion(@RequestBody StadionDTO nowyStadionDTO) {
         return stadionService.addStadion(nowyStadionDTO);
     }
+
+    @PutMapping("/{id}")
+    public StadionDTO updateStadion(@PathVariable Long id, @RequestBody StadionDTO dto) {
+        return stadionService.updateStadion(id, dto);
+    }
 }

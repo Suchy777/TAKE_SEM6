@@ -31,11 +31,6 @@ public class MeczController {
         return meczService.getMeczById(id);
     }
 
-    @PutMapping("/{id}/wynik")
-    public MeczDTO updateMeczWynik(@PathVariable Long id, @RequestBody MeczDTO dto) {
-        return meczService.updateMeczWynik(id, dto);
-    }
-
     @DeleteMapping("/{id}")
     public void deleteMecz(@PathVariable Long id) {
         meczService.deleteMecz(id);
@@ -44,5 +39,10 @@ public class MeczController {
     @PostMapping
     public MeczDTO addMecz(@RequestBody pl.sucheniaserafin.liga.dto.MeczCreateDTO dto) {
         return meczService.addMecz(dto);
+    }
+
+    @PutMapping("/{id}")
+    public MeczDTO updateMecz(@PathVariable Long id, @RequestBody pl.sucheniaserafin.liga.dto.MeczCreateDTO dto) {
+        return meczService.updateMecz(id, dto);
     }
 }

@@ -49,4 +49,15 @@ public class StadionService {
 
         return new StadionDTO(zapisany.getId(), zapisany.getNazwa(), zapisany.getKraj(), zapisany.getMiasto(), zapisany.getPojemnosc());
     }
+
+    public StadionDTO updateStadion(Long id, StadionDTO dto) {
+        return stadionRepository.findById(id).map(s -> {
+            s.setNazwa(dto.nazwa());
+            s.setKraj(dto.kraj());
+            s.setMiasto(dto.miasto());
+            s.setPojemnosc(dto.pojemnosc());
+            Stadion zaktualizowany = stadionRepository.save(s);
+            return new StadionDTO(zaktualizowany.getId(), zaktualizowany.getNazwa(), zaktualizowany.getKraj(), zaktualizowany.getMiasto(), zaktualizowany.getPojemnosc());
+        }).orElse(null);
+    }
 }

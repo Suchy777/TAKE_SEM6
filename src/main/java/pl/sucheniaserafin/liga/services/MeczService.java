@@ -36,11 +36,33 @@ public class MeczService {
         meczRepository.deleteById(id);
     }
 
-    public MeczDTO updateMeczWynik(Long id, MeczDTO dto) {
+    // PEŁNOPRAWNY PUT (Aktualizacja całego meczu)
+    public MeczDTO updateMecz(Long id, MeczCreateDTO dto) {
         return meczRepository.findById(id).map(m -> {
+            if(dto.dataOdbycia() != null && !dto.dataOdbycia().isEmpty()) {
+                m.setDataOdbycia(LocalDateTime.parse(dto.dataOdbycia()));
+            }
             m.setWynik(dto.wynik());
+            m.setFrekwencja(dto.frekwencja());
+            
+            if(dto.gospodarzId() != null) {
+                m.setGospodarz(klubRepository.findById(dto.gospodarzId()).orElse(m.getGospodarz()));
+            }
+            if(dto.goscId() != null) {
+                m.setGosc(klubRepository.findById(dto.goscId()).orElse(m.getGosc()));
+            }
+            if (dto.stadionId() != null) {
+                m.setStadion(stadionRepository.findById(dto.stadionId()).orElse(m.getStadion()));
+            }
+
             Mecz zaktualizowany = meczRepository.save(m);
-            return new MeczDTO(zaktualizowany.getId(), zaktualizowany.getDataOdbycia() != null ? zaktualizowany.getDataOdbycia().toString() : "Brak", zaktualizowany.getWynik(), zaktualizowany.getGospodarz().getNazwa(), zaktualizowany.getGosc().getNazwa(), zaktualizowany.getStadion() != null ? zaktualizowany.getStadion().getNazwa() : "Brak");
+            
+            return new MeczDTO(zaktualizowany.getId(), 
+                    zaktualizowany.getDataOdbycia() != null ? zaktualizowany.getDataOdbycia().toString() : "Brak", 
+                    zaktualizowany.getWynik(), 
+                    zaktualizowany.getGospodarz().getNazwa(), 
+                    zaktualizowany.getGosc().getNazwa(), 
+                    zaktualizowany.getStadion() != null ? zaktualizowany.getStadion().getNazwa() : "Brak");
         }).orElse(null);
     }
 
