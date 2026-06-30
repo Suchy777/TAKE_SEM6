@@ -22,7 +22,10 @@ public class Klub {
     @Column(length = 50)
     private String miasto;
 
-    // Relacje
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "stadion_id")
+    private Stadion stadion;
+
     @OneToMany(mappedBy = "klub", cascade = CascadeType.ALL)
     private List<Pilkarz> pilkarze;
 

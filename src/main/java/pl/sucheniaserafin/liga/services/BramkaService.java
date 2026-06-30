@@ -1,5 +1,6 @@
 package pl.sucheniaserafin.liga.services;
 
+import jakarta.transaction.Transactional; // dodane na przyszłość dla transakcyjności
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.sucheniaserafin.liga.dto.BramkaDTO;
@@ -22,21 +23,20 @@ public class BramkaService {
     @Autowired private MeczRepository meczRepository;
     @Autowired private PilkarzRepository pilkarzRepository;
 
+    private BramkaDTO mapToDTO(Bramka b) {
+        String klub = b.getStrzelec().getKlub() != null ? b.getStrzelec().getKlub().getNazwa() : "Brak klubu";
+        String mecz = b.getMecz().getGospodarz().getNazwa() + " vs " + b.getMecz().getGosc().getNazwa();
+        return new BramkaDTO(b.getId(), b.getMinuta(), b.getStrzelec().getNazwisko(), klub, mecz);
+    }
+
     public List<BramkaDTO> getAllBramki() {
         return StreamSupport.stream(bramkaRepository.findAll().spliterator(), false)
-                .map(b -> new BramkaDTO(
-                        b.getId(),
-                        b.getMinuta(),
-                        b.getStrzelec().getNazwisko(),
-                        b.getMecz().getGospodarz().getNazwa() + " vs " + b.getMecz().getGosc().getNazwa()
-                ))
+                .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
 
     public BramkaDTO getBramkaById(Long id) {
-        return bramkaRepository.findById(id)
-                .map(b -> new BramkaDTO(b.getId(), b.getMinuta(), b.getStrzelec().getNazwisko(), b.getMecz().getGospodarz().getNazwa() + " vs " + b.getMecz().getGosc().getNazwa()))
-                .orElse(null);
+        return bramkaRepository.findById(id).map(this::mapToDTO).orElse(null);
     }
 
     public void deleteBramka(Long id) {
@@ -46,25 +46,45 @@ public class BramkaService {
     public BramkaDTO updateBramka(Long id, BramkaDTO dto) {
         return bramkaRepository.findById(id).map(b -> {
             b.setMinuta(dto.minuta());
-            Bramka zaktualizowana = bramkaRepository.save(b);
-            return new BramkaDTO(zaktualizowana.getId(), zaktualizowana.getMinuta(), zaktualizowana.getStrzelec().getNazwisko(), zaktualizowana.getMecz().getGospodarz().getNazwa() + " vs " + zaktualizowana.getMecz().getGosc().getNazwa());
+            return mapToDTO(bramkaRepository.save(b));
         }).orElse(null);
     }
 
+    @Transactional 
     public BramkaDTO addBramka(BramkaEventDTO dto) {
-        // Wyszukiwanie istniejącego meczu i piłkarza w bazie
         Mecz mecz = meczRepository.findById(dto.meczId())
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono meczu o id: " + dto.meczId()));
         Pilkarz pilkarz = pilkarzRepository.findById(dto.pilkarzId())
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono piłkarza o id: " + dto.pilkarzId()));
+
+
+        if (pilkarz.getKlub() != null) {
+            String obecnyWynik = mecz.getWynik(); 
+            if (obecnyWynik == null || obecnyWynik.isBlank()) {
+                obecnyWynik = "0:0";
+            }
+            
+            String[] czesci = obecnyWynik.split(":");
+            int goleGospodarz = Integer.parseInt(czesci[0]);
+            int goleGosc = Integer.parseInt(czesci[1]);
+
+            if (pilkarz.getKlub().getId().equals(mecz.getGospodarz().getId())) {
+                goleGospodarz++;
+            } else if (pilkarz.getKlub().getId().equals(mecz.getGosc().getId())) {
+                goleGosc++;
+            } else {
+                throw new RuntimeException("Piłkarz nie gra w żadnej z drużyn w tym meczu!");
+            }
+            
+            mecz.setWynik(goleGospodarz + ":" + goleGosc);
+            meczRepository.save(mecz);
+        }
 
         Bramka bramka = new Bramka();
         bramka.setMecz(mecz);
         bramka.setStrzelec(pilkarz);
         bramka.setMinuta(dto.minuta());
 
-        Bramka zapisana = bramkaRepository.save(bramka);
-
-        return new BramkaDTO(zapisana.getId(), zapisana.getMinuta(), zapisana.getStrzelec().getNazwisko(), zapisana.getMecz().getGospodarz().getNazwa() + " vs " + zapisana.getMecz().getGosc().getNazwa());
+        return mapToDTO(bramkaRepository.save(bramka));
     }
 }

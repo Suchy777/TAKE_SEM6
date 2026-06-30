@@ -23,22 +23,20 @@ public class KartkaService {
     @Autowired private MeczRepository meczRepository;
     @Autowired private PilkarzRepository pilkarzRepository;
 
+    private KartkaDTO mapToDTO(Kartka k) {
+        String klub = k.getUkarany().getKlub() != null ? k.getUkarany().getKlub().getNazwa() : "Brak klubu";
+        String mecz = k.getMecz().getGospodarz().getNazwa() + " vs " + k.getMecz().getGosc().getNazwa();
+        return new KartkaDTO(k.getId(), k.getKolor().toString(), k.getMinuta(), k.getUkarany().getNazwisko(), klub, mecz);
+    }
+
     public List<KartkaDTO> getAllKartki() {
         return StreamSupport.stream(kartkaRepository.findAll().spliterator(), false)
-                .map(k -> new KartkaDTO(
-                        k.getId(),
-                        k.getKolor().toString(),
-                        k.getMinuta(),
-                        k.getUkarany().getNazwisko(),
-                        k.getMecz().getGospodarz().getNazwa() + " vs " + k.getMecz().getGosc().getNazwa()
-                ))
+                .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
 
     public KartkaDTO getKartkaById(Long id) {
-        return kartkaRepository.findById(id)
-                .map(k -> new KartkaDTO(k.getId(), k.getKolor().toString(), k.getMinuta(), k.getUkarany().getNazwisko(), k.getMecz().getGospodarz().getNazwa() + " vs " + k.getMecz().getGosc().getNazwa()))
-                .orElse(null);
+        return kartkaRepository.findById(id).map(this::mapToDTO).orElse(null);
     }
 
     public void deleteKartka(Long id) {
@@ -48,17 +46,14 @@ public class KartkaService {
     public KartkaDTO updateKartka(Long id, KartkaDTO dto) {
         return kartkaRepository.findById(id).map(k -> {
             k.setMinuta(dto.minuta());
-            // Jeśli podano kolor w DTO przy edycji, też go aktualizujemy:
             if(dto.kolor() != null && !dto.kolor().isEmpty()){
                 k.setKolor(KolorKartki.valueOf(dto.kolor().toUpperCase()));
             }
-            Kartka zaktualizowana = kartkaRepository.save(k);
-            return new KartkaDTO(zaktualizowana.getId(), zaktualizowana.getKolor().toString(), zaktualizowana.getMinuta(), zaktualizowana.getUkarany().getNazwisko(), zaktualizowana.getMecz().getGospodarz().getNazwa() + " vs " + zaktualizowana.getMecz().getGosc().getNazwa());
+            return mapToDTO(kartkaRepository.save(k));
         }).orElse(null);
     }
 
     public KartkaDTO addKartka(KartkaEventDTO dto) {
-        // Wyszukiwanie istniejącego meczu i piłkarza w bazie
         Mecz mecz = meczRepository.findById(dto.meczId())
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono meczu o id: " + dto.meczId()));
         Pilkarz pilkarz = pilkarzRepository.findById(dto.pilkarzId())
@@ -70,8 +65,6 @@ public class KartkaService {
         kartka.setMinuta(dto.minuta());
         kartka.setKolor(KolorKartki.valueOf(dto.kolor().toUpperCase()));
 
-        Kartka zapisana = kartkaRepository.save(kartka);
-
-        return new KartkaDTO(zapisana.getId(), zapisana.getKolor().toString(), zapisana.getMinuta(), zapisana.getUkarany().getNazwisko(), zapisana.getMecz().getGospodarz().getNazwa() + " vs " + zapisana.getMecz().getGosc().getNazwa());
+        return mapToDTO(kartkaRepository.save(kartka));
     }
 }

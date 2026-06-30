@@ -34,18 +34,31 @@ public class MeczService {
 
     // Pomocnicza metoda mapująca encję na DTO z uwzględnieniem list zdarzeń
     private MeczDTO mapToDTO(Mecz m) {
+        // Formatter dla ładniejszej daty
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+        String sformatowanaData = m.getDataOdbycia() != null ? m.getDataOdbycia().format(formatter) : "Brak";
+
         return new MeczDTO(
                 m.getId(),
-                m.getDataOdbycia() != null ? m.getDataOdbycia().toString() : "Brak",
+                sformatowanaData,
                 m.getWynik(),
                 m.getGospodarz().getNazwa(),
                 m.getGosc().getNazwa(),
                 m.getStadion() != null ? m.getStadion().getNazwa() : "Brak",
                 m.getBramki().stream().map(b -> new BramkaDTO(
-                        b.getId(), b.getMinuta(), b.getStrzelec().getNazwisko(), m.getWynik()
+                        b.getId(), 
+                        b.getMinuta(), 
+                        b.getStrzelec().getNazwisko(), 
+                        b.getStrzelec().getKlub() != null ? b.getStrzelec().getKlub().getNazwa() : "Brak klubu",
+                        m.getGospodarz().getNazwa() + " vs " + m.getGosc().getNazwa()
                 )).collect(Collectors.toList()),
                 m.getKartki().stream().map(k -> new KartkaDTO(
-                        k.getId(), k.getKolor().toString(), k.getMinuta(), k.getUkarany().getNazwisko(), m.getWynik()
+                        k.getId(), 
+                        k.getKolor().toString(), 
+                        k.getMinuta(), 
+                        k.getUkarany().getNazwisko(), 
+                        k.getUkarany().getKlub() != null ? k.getUkarany().getKlub().getNazwa() : "Brak klubu",
+                        m.getGospodarz().getNazwa() + " vs " + m.getGosc().getNazwa()
                 )).collect(Collectors.toList())
         );
     }
@@ -57,7 +70,8 @@ public class MeczService {
     public MeczDTO updateMecz(Long id, MeczCreateDTO dto) {
         return meczRepository.findById(id).map(m -> {
             if(dto.dataOdbycia() != null && !dto.dataOdbycia().isEmpty()) {
-                m.setDataOdbycia(LocalDateTime.parse(dto.dataOdbycia()));
+                java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+                m.setDataOdbycia(LocalDateTime.parse(dto.dataOdbycia(), formatter));
             }
             m.setWynik(dto.wynik());
             m.setFrekwencja(dto.frekwencja());
@@ -80,7 +94,8 @@ public class MeczService {
     public MeczDTO addMecz(MeczCreateDTO dto) {
         Mecz mecz = new Mecz();
         if(dto.dataOdbycia() != null && !dto.dataOdbycia().isEmpty()) {
-            mecz.setDataOdbycia(LocalDateTime.parse(dto.dataOdbycia()));
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+            mecz.setDataOdbycia(LocalDateTime.parse(dto.dataOdbycia(), formatter));
         }
         mecz.setWynik(dto.wynik());
         mecz.setFrekwencja(dto.frekwencja());

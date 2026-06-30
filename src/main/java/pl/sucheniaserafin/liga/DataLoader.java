@@ -29,14 +29,14 @@ public class DataLoader implements CommandLineRunner {
         stadionRepository.save(silesia);
 
         // 2. Tworzymy Kluby
-        Klub legia = new Klub(null, "Legia Warszawa", "Polska", "Warszawa", new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
-        Klub ruch = new Klub(null, "Ruch Chorzów", "Polska", "Chorzów", new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        Klub legia = new Klub(null, "Legia Warszawa", "Polska", "Warszawa", narodowy, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        Klub ruch = new Klub(null, "Ruch Chorzów", "Polska", "Chorzów", silesia, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
         klubRepository.save(legia);
         klubRepository.save(ruch);
 
         // 3. Tworzymy Piłkarzy
         Pilkarz p1 = new Pilkarz(null, "Artur", "Jędrzejczyk", LocalDate.of(1987, 11, 4), legia, new ArrayList<>(), new ArrayList<>());
-        Pilkarz p2 = new Pilkarz(null, "Josue", "Peszkowski", LocalDate.of(1990, 9, 17), legia, new ArrayList<>(), new ArrayList<>());
+        Pilkarz p2 = new Pilkarz(null, "Josue", "Pesquera", LocalDate.of(1990, 9, 17), legia, new ArrayList<>(), new ArrayList<>());
         Pilkarz p3 = new Pilkarz(null, "Tomasz", "Foszmańczyk", LocalDate.of(1986, 1, 7), ruch, new ArrayList<>(), new ArrayList<>());
         pilkarzRepository.save(p1);
         pilkarzRepository.save(p2);
