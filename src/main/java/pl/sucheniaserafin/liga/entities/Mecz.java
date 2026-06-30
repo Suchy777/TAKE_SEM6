@@ -33,7 +33,7 @@ public class Mecz {
     @JoinColumn(name = "stadion_id")
     private Stadion stadion;
 
-    // Scenariusz 2 - Zbiorcze zapisywanie (Kaskadowość z wykładu)
+    // Scenariusz 2 - Zbiorcze zapisywanie 
     @OneToMany(mappedBy = "mecz", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bramka> bramki;
 

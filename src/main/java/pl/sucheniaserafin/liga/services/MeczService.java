@@ -32,9 +32,7 @@ public class MeczService {
                 .orElse(null);
     }
 
-    // Pomocnicza metoda mapująca encję na DTO z uwzględnieniem list zdarzeń
     private MeczDTO mapToDTO(Mecz m) {
-        // Formatter dla ładniejszej daty
         java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
         String sformatowanaData = m.getDataOdbycia() != null ? m.getDataOdbycia().format(formatter) : "Brak";
 

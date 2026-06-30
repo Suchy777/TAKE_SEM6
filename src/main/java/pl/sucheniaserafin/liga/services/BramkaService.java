@@ -1,6 +1,6 @@
 package pl.sucheniaserafin.liga.services;
 
-import jakarta.transaction.Transactional; // dodane na przyszłość dla transakcyjności
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.sucheniaserafin.liga.dto.BramkaDTO;

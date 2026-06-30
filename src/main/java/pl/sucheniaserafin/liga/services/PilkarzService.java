@@ -18,7 +18,6 @@ public class PilkarzService {
     @Autowired private PilkarzRepository pilkarzRepository;
     @Autowired private KlubRepository klubRepository;
 
-    // Pomocnicza metoda do mapowania
     private PilkarzDTO mapToDTO(Pilkarz p) {
         Long klubId = p.getKlub() != null ? p.getKlub().getId() : null;
         String nazwaKlubu = p.getKlub() != null ? p.getKlub().getNazwa() : "Brak klubu";
@@ -51,7 +50,6 @@ public class PilkarzService {
         pilkarz.setImie(dto.imie());
         pilkarz.setNazwisko(dto.nazwisko());
 
-        // Przypisanie klubu po ID z DTO
         if (dto.klubId() != null) {
             Klub klub = klubRepository.findById(dto.klubId())
                     .orElseThrow(() -> new RuntimeException("Nie znaleziono klubu o id: " + dto.klubId()));
@@ -67,7 +65,6 @@ public class PilkarzService {
             p.setImie(dto.imie());
             p.setNazwisko(dto.nazwisko());
             
-            // Aktualizacja klubu
             if (dto.klubId() != null) {
                 Klub klub = klubRepository.findById(dto.klubId())
                         .orElseThrow(() -> new RuntimeException("Nie znaleziono klubu o id: " + dto.klubId()));

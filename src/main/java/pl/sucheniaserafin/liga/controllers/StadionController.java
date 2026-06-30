@@ -11,7 +11,6 @@ import java.util.List;
 @RequestMapping("/api/stadiony")
 public class StadionController {
 
-    // Zamiast Repository, wstrzykujemy nasz nowy Service!
     @Autowired
     private StadionService stadionService;
 

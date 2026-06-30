@@ -57,6 +57,6 @@ public class DataLoader implements CommandLineRunner {
         kartkaRepository.save(k1);
         kartkaRepository.save(k2);
         
-        System.out.println("✅ Przykładowe dane zostały załadowane do bazy H2!");
+        System.out.println("Przykładowe dane zostały załadowane do bazy H2!");
     }
 }

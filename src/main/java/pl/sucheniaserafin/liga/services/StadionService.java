@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-@Service // Ta adnotacja to klucz! Mówi Springowi, że to warstwa logiki biznesowej
+@Service 
 public class StadionService {
 
     @Autowired
